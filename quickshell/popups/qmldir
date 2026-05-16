@@ -1,0 +1,7 @@
+module Popups
+StartMenu 1.0 StartMenu.qml
+PopupWindowFrame 1.0 PopupWindowFrame.qml
+AppLauncher 1.0 AppLauncher.qml
+ThemeMenu 1.0 ThemeMenu.qml
+CalendarPopup 1.0 CalendarPopup.qml
+PowerMenu 1.0 PowerMenu.qml

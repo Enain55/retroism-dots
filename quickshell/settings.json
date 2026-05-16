@@ -1,0 +1,29 @@
+{
+    "settings": {
+        "bar": {
+            "fontSize": 12,
+            "monochromeTrayIcons": true,
+            "trayIconSize": 16
+        },
+        "currentTheme": "yorha",
+        "execCommands": {
+            "files": "nemo",
+            "terminal": "kitty",
+            "shutdown": "systemctl poweroff",
+            "reboot": "systemctl reboot",
+            "suspend": "systemctl suspend",
+            "logout": "hyprctl dispatch exit"
+        },
+        "militaryTimeClockFormat": true,
+        "setWallpaperToThemeWallpaper": true,
+        "systemDetails": {
+            "cpu": "AMD Ryzen 5 7600",
+            "gpu": "AMD Radeon RX 6800",
+            "osName": "Arch Linux",
+            "osVersion": "Rolling Release",
+            "ram": "32 GB"
+        },
+        "systemProfileImageSource": "/home/moerutaiyo/Pictures/system_profile_picture.jpg",
+        "version": "0.1"
+    }
+}

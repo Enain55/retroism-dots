@@ -157,7 +157,9 @@ Scope {
                 }
 
                 function closeAllPopups() {
-                    switch (root.currentPopup) {
+                    const closing = root.currentPopup;
+                    root.currentPopup = Config.SystemPopup.None;
+                    switch (closing) {
                     case Config.SystemPopup.Startmenu:
                         startMenu.closeStartMenu();
                         break;
@@ -174,23 +176,23 @@ Scope {
                         powerMenu.closePowerMenu();
                         break;
                     }
-                    root.currentPopup = Config.SystemPopup.None;
                 }
 
                 TaskbarButton {
                     id: startmenuButton
-                    isToggled: root.currentPopup == Config.SystemPopup.Startmenu ? true : false
+                    isToggled: startMenu.isOpen
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.leftMargin: workspaces.width + 20 + 4
                     onClicked: {
-                        if (root.currentPopup == Config.SystemPopup.None) {
-                            startMenu.openStartMenu();
-                            root.currentPopup = Config.SystemPopup.Startmenu;
-                        } else {
+                        if (startMenu.isOpen) {
                             taskbar.closeAllPopups();
-                            root.currentPopup = Config.SystemPopup.None;
+                            return;
                         }
+                        if (root.currentPopup != Config.SystemPopup.None)
+                            taskbar.closeAllPopups();
+                        startMenu.openStartMenu();
+                        root.currentPopup = Config.SystemPopup.Startmenu;
                     }
                 }
                 TaskbarButton {
@@ -290,9 +292,9 @@ Scope {
                 color: "transparent"
 
                 readonly property bool calendarOnly: root.currentPopup == Config.SystemPopup.Calendar
-                readonly property bool blocksClicks: root.currentPopup != Config.SystemPopup.None
-                    && root.currentPopup != Config.SystemPopup.Startmenu
-                    && root.currentPopup != Config.SystemPopup.PowerMenu
+                readonly property bool blocksClicks: root.currentPopup == Config.SystemPopup.ThemePicker
+                    || root.currentPopup == Config.SystemPopup.AppLauncher
+                    || root.currentPopup == Config.SystemPopup.Calendar
                 implicitHeight: calendarOnly ? screen.height - taskbar.implicitHeight : screen.height
 
                 anchors {

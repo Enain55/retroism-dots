@@ -16,7 +16,6 @@ Rectangle {
     opacity: 1
     anchors.fill: parent
     color: Config.colors.base
-    layer.enabled: true
 
     property int windowTitleDecorationWidth: 100
     property string windowTitle: "Window Title"

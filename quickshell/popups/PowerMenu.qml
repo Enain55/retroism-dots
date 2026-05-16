@@ -10,7 +10,9 @@ PopupWindow {
 
     property int menuWidth: 0
     property var closeCallback: function () {}
+    property bool isOpen: false
 
+    visible: isOpen
     anchor.window: taskbar
     anchor.rect.x: menuWidth
     anchor.rect.y: parentWindow.implicitHeight
@@ -20,10 +22,8 @@ PopupWindow {
 
     Rectangle {
         id: frame
-        opacity: 0
         anchors.fill: parent
         color: Config.colors.base
-        layer.enabled: true
 
         property int topOffset: 20
 
@@ -115,34 +115,18 @@ PopupWindow {
             }
         }
 
-        OpacityAnimator {
-            id: openAnimation
-            target: frame
-            from: 0
-            to: 1
-            duration: 140
-            easing.type: Easing.OutCubic
-        }
-        OpacityAnimator {
-            id: closeAnimation
-            target: frame
-            from: 1
-            to: 0
-            duration: 80
-            easing.type: Easing.InOutQuad
-            onFinished: root.visible = false
-        }
+    }
+
+    onIsOpenChanged: {
+        if (isOpen)
+            reposition();
     }
 
     function openPowerMenu() {
-        closeAnimation.stop();
-        root.visible = true;
-        frame.opacity = 0;
-        openAnimation.start();
+        root.isOpen = true;
     }
 
     function closePowerMenu() {
-        openAnimation.stop();
-        closeAnimation.start();
+        root.isOpen = false;
     }
 }

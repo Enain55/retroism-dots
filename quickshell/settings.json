@@ -8,11 +8,11 @@
         "currentTheme": "yorha",
         "execCommands": {
             "files": "nemo",
-            "terminal": "kitty",
-            "shutdown": "systemctl poweroff",
+            "logout": "hyprctl dispatch exit",
             "reboot": "systemctl reboot",
+            "shutdown": "systemctl poweroff",
             "suspend": "systemctl suspend",
-            "logout": "hyprctl dispatch exit"
+            "terminal": "kitty"
         },
         "militaryTimeClockFormat": true,
         "setWallpaperToThemeWallpaper": true,

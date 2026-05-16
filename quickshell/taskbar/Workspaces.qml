@@ -1,6 +1,5 @@
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.I3
 import QtQuick
 import QtQuick.Controls.Basic
 import QtQuick.Layouts
@@ -13,36 +12,84 @@ RowLayout {
     anchors.left: parent.left
     anchors.verticalCenter: parent.verticalCenter
 
-     property bool usingHyprland: Hyprland.workspaces.values.length == 0 ? false : true
+    readonly property string screenName: taskbar.screen?.name ?? ""
+    readonly property bool usingHyprland: Hyprland.requestSocketPath !== ""
 
-    // TODO: Improve this functionality
-    property var currentWorkspaces: usingHyprland ? Hyprland.workspaces.values.filter(w => w.monitor.name == taskbar.screen.name) : I3.workspaces.values.filter(w => w.monitor.name == taskbar.screen.name)
+    readonly property var hyprMonitor: usingHyprland && screenName !== ""
+        ? Hyprland.monitorFor(taskbar.screen)
+        : null
 
+    readonly property var currentWorkspaces: {
+        if (!usingHyprland)
+            return [];
+        const all = Hyprland.workspaces.values;
+        if (!all || all.length === 0)
+            return [];
+        const filtered = all.filter(w => w && workspaceOnScreen(w));
+        return filtered.length > 0 ? filtered : all.filter(w => w);
+    }
 
-    Repeater { 
-        model: parent.currentWorkspaces
-        //model: Hyprland.workspaces.values.filter(w => w.monitor.name == taskbar.screen.name)
+    function workspaceOnScreen(workspace) {
+        if (!workspace)
+            return false;
+        if (!workspace.monitor)
+            return true;
+        if (hyprMonitor && workspace.monitor.id === hyprMonitor.id)
+            return true;
+        return workspace.monitor.name === screenName;
+    }
+
+    function workspaceLabel(workspace) {
+        if (!workspace)
+            return "";
+        if (workspace.name && workspace.name !== "")
+            return workspace.name;
+        return workspace.id;
+    }
+
+    function focusedWorkspaceId() {
+        if (!Hyprland.focusedWorkspace)
+            return -1;
+        return Hyprland.focusedWorkspace.id;
+    }
+
+    Connections {
+        target: Hyprland
+        function onRawEvent(event) {
+            if (!workspaces.usingHyprland)
+                return;
+            const n = event.name;
+            if (n === "workspace" || n === "workspacev2" || n === "focusedmon" || n === "monitorremoved" || n === "monitoradded")
+                Hyprland.refreshWorkspaces();
+        }
+    }
+
+    Repeater {
+        model: workspaces.currentWorkspaces
+
         Button {
             id: control
+            required property var modelData
+
             anchors.centerIn: parent.centerIn
+
             contentItem: Text {
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
-                text: usingHyprland ? modelData.id : modelData.number
+                text: workspaces.workspaceLabel(modelData)
                 font.family: fontMonaco.name
                 width: 10
                 height: 10
                 font.pixelSize: Config.settings.bar.fontSize
                 color: Config.colors.text
             }
+
             onPressed: event => {
-                if(usingHyprland) {
-                    Hyprland.dispatch(`workspace ` + modelData.id);
-                }else {
-                  I3.dispatch(`workspace ` + modelData.number);
-                }
+                if (modelData)
+                    modelData.activate();
                 event.accepted = true;
             }
+
             NewBorder {
                 commonBorderWidth: 2
                 commonBorder: false
@@ -54,26 +101,15 @@ RowLayout {
                 zValue: -1
             }
 
-            // TODO: Improve this, it's very messy right now.
-            property int focusedWindowId: 0
             function getColor() {
-                if (usingHyprland == true) {
-                  focusedWindowId = Hyprland.focusedWorkspace.id;
-                }else {
-                  focusedWindowId = I3.focusedWorkspace.number;
-                }
-
-                if (modelData.urgent) {
+                const focusedId = workspaces.focusedWorkspaceId();
+                if (modelData?.urgent)
                     return Config.colors.urgent;
-                } else {
-                    if ((usingHyprland && modelData.id == focusedWindowId) || mouse.hovered) {
-                         return Config.colors.shadow;
-                    }else if ((usingHyprland == false && modelData.number == focusedWindowId) || mouse.hovered) {
-                         return Config.colors.shadow;
-                    }
-                }
+                if (modelData && (modelData.id === focusedId || mouse.hovered))
+                    return Config.colors.shadow;
                 return Config.colors.base;
             }
+
             background: Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -81,7 +117,7 @@ RowLayout {
                 border.color: Config.colors.outline
                 width: 22
                 height: 22
-                color: getColor()
+                color: control.getColor()
             }
 
             HoverHandler {

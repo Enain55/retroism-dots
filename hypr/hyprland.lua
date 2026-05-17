@@ -19,6 +19,7 @@ hl.monitor({ output = "DP-2", mode = "2560x1440@165", position = "1920x0", scale
 -- ── ENVIRONMENT VARIABLES ────────────────────────────────────────────────────────
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")
+hl.env("XCURSOR_THEME", "Hackneyed-White-Mono-Animated-Dark-24px")
 
 -- ── AUTOSTART ────────────────────────────────────────────────────────────────────
 hl.on("hyprland.start", function()
@@ -26,7 +27,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("hyprpaper")
     hl.exec_cmd("quickshell")
-    hl.exec_cmd("hyprctl setcursor Hackneyed-24px 24")
+    hl.exec_cmd("hyprctl setcursor Hackneyed-White-Mono-Animated-Dark-24px 24")
 end)
 
 -- ── MAIN CONFIGURATION BLOCK ─────────────────────────────────────────────────────
@@ -106,6 +107,7 @@ hl.bind(mainMod .. " + Q",            hl.dsp.window.close())
 hl.bind(mainMod .. " + E",            hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + D",            hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + B",            hl.dsp.exec_cmd("firefox"))
+hl.bind("CTRL + ALT + Delete",        hl.dsp.exec_cmd("wlogout"))
 
 -- Window Layout & State
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
